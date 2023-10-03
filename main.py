@@ -35,7 +35,11 @@ async def echo_mess(message: types.Message):
                 files = os.listdir(f"files/{date_now_year}")
                 await bot.send_message(message.chat.id, f"Найдено {len(files)} файл(ов)")
                 rep_a, num_rep = report(files, date_now_year)
-                await bot.send_message(message.chat.id, f"Посчитано {num_rep} файл(ов)")
+                await bot.send_message(message.chat.id, f"Посчитано {num_rep[0]} файл(ов)")
+                rep_masters = ""
+                for i in range(1, len(num_rep)):
+                    rep_masters += f'{num_rep[i]} \n'
+                await bot.send_message(message.chat.id, rep_masters)
                 print(files)
                 at_int = rep_a["at_int"]
                 at_int_pri = rep_a["at_int_pri"]
@@ -53,6 +57,7 @@ async def echo_mess(message: types.Message):
                 et_dom_pri = rep_a["et_dom_pri"]
                 et_serv = rep_a["et_serv"]
                 et_serv_tv = rep_a["et_serv_tv"]
+
                 answer = (f"ТО Запад {date_now_no_year} \n\n"
                           f"ЭХ: интернет {at_int}({at_int_pri} прив), сервис {at_serv} \n"
                           f"Тиера: интернет {ti_int}({ti_int_pri} прив), сервис {ti_serv} \n"
@@ -85,7 +90,7 @@ async def echo_mess(message: types.Message):
                 await bot.send_message(message.chat.id, f"Дата не указана или указана не верно")
 
         else:
-            # Создадим папку за текущий день
+            # Создадим папку за текущий день если не существует
             if not os.path.exists(f"files/{date_now_year}"):
                 os.makedirs(f"files/{date_now_year}")
 
@@ -195,14 +200,10 @@ async def echo_mess(message: types.Message):
 
             for_tv = txt[3].split("ТВ")
             for_tv = for_tv[-1].split("(")
-            print(f"тут {for_tv}")
-            # et_serv_tv = filter(str.isdecimal, new_txt_et[6])
-            # et_serv_tv = ''.join(et_serv_tv)
             try:
                 et_serv_tv = int(for_tv[0])
             except ValueError:
                 et_serv_tv = 0
-            print(f"тут {et_serv_tv}")
 
             to_save = {
                 "at_int": at_int,
@@ -218,16 +219,29 @@ async def echo_mess(message: types.Message):
                 "et_tv": et_tv,
                 "et_tv_pri": et_tv_pri,
                 "et_dom": et_dom,
-                "et_dom_pri":et_dom_pri,
+                "et_dom_pri": et_dom_pri,
                 "et_serv": et_serv,
-                "et_serv_tv": et_serv_tv
+                "et_serv_tv": et_serv_tv,
+                'master': "не указан"
             }
+
+            print(message)
+
+            if message.forward_from is not None:
+                if message.forward_from.last_name:
+                    to_save["master"] = message.forward_from.last_name
+                elif message.forward_from.first_name:
+                    to_save["master"] = message.forward_from.first_name
+            elif message.forward_sender_name is not None:
+                to_save["master"] = message.forward_sender_name
+            else:
+                to_save["master"] = "не указан"
 
             # Сохраним в файл
             with open(f'files/{date_now_year}/{date_now}.json', 'w') as outfile:
                 json.dump(to_save, outfile)
 
-            answe1 = (f"ТО Запад {date_now_no_year} \n\n"
+            answe1 = (f"ТО Запад {date_now_no_year}. Мастер {to_save['master']} \n\n"
                       f"ЭХ: интернет {at_int}({at_int_pri} прив), сервис {at_serv} \n" 
                       f"Тиера: интернет {ti_int}({ti_int_pri} прив), сервис {ti_serv} \n" 
                       f"ЕТ: интернет {et_int}({et_int_pri} прив), "
@@ -243,18 +257,8 @@ async def echo_mess(message: types.Message):
 
             print(answe1)
 
-            # await bot.send_message(message.chat.id, f"{message.text}")
             await bot.send_message(message.chat.id, f"{answe1}")
 
-        # try:
-        #     if len(answer) > 0:
-        #         for i in answer:
-        #             # await bot.send_message(message.chat.id, f"Ответ: {answer[x]}")
-        #             await bot.send_message(message.chat.id, i)
-        # except:
-        #     print(f"{datetime.now()}: Ошибка с получением ответа от парсера")
-        #     await bot.send_message(message.chat.id, f"Ответ: Ошибка с получением ответа от парсера")
-        #     # send_telegram(f"Ответ: Ошибка с получением ответа от парсера")
     else:
         await bot.send_message(message.chat.id, "Вы не авторизованны")
 
@@ -278,7 +282,9 @@ def report(files, date):
         "et_serv": 0,
         "et_serv_tv": 0
     }
-    rep = 0
+    # Возвращаем количество отчетов для сверки. Первый индекс количество, остальные фамилии мастеров
+    rep = [0]
+    # masters = []
     for file in files:
         with open(f'files/{date}/{file}', 'r') as outfile:
             data = json.load(outfile)
@@ -299,10 +305,12 @@ def report(files, date):
             to_save["et_dom_pri"] += data["et_dom_pri"]
             to_save["et_serv"] += data["et_serv"]
             to_save["et_serv_tv"] += data["et_serv_tv"]
-            rep += 1
+            rep[0] += 1  # Добавим счетчик количества посчитанных
+            rep.append(data["master"])  # Добавим фамилию мастера
 
     # Сохраним в файл
-    with open(f'files/{date}/report.json', 'w') as outfile:
+    # Хотя необходимости нет
+    with open(f'files/{date}.json', 'w') as outfile:
         json.dump(to_save, outfile)
 
     return to_save, rep
