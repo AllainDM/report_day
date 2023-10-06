@@ -14,6 +14,10 @@ dp = Dispatcher(bot)
 
 if not os.path.exists(f"files"):
     os.makedirs(f"files")
+if not os.path.exists(f"files/ТО Запад"):
+    os.makedirs(f"files/ТО Запад")
+if not os.path.exists(f"files/ТО Север"):
+    os.makedirs(f"files/ТО Север")
 
 
 @dp.message_handler()
@@ -21,7 +25,14 @@ async def echo_mess(message: types.Message):
     # Получим ид пользователя и сравним со списком разрешенных в файле конфига
     user_id = message.from_user.id
     print(f"user_id {user_id}")
+    t_o = ""
     if user_id in config.users:
+        # Определим ТО по ид юзера в телеграм
+        if user_id == 976374565:
+            t_o = "ТО Запад"
+        elif user_id == 652928171:
+            t_o = "ТО Север"
+
         # answer = []
         date_now = datetime.now()
         date_ago = date_now - timedelta(1)  # здесь мы выставляем минус день
@@ -31,10 +42,10 @@ async def echo_mess(message: types.Message):
 
         if message.text == "1" or message.text == "отчет" or message.text == "отчёт":
             await bot.send_message(message.chat.id, f"Готовим отчет")
-            if os.path.exists(f"files/{date_now_year}"):
-                files = os.listdir(f"files/{date_now_year}")
+            if os.path.exists(f"files/{t_o}/{date_now_year}"):
+                files = os.listdir(f"files/{t_o}/{date_now_year}")
                 await bot.send_message(message.chat.id, f"Найдено {len(files)} файл(ов)")
-                rep_a, num_rep = report(files, date_now_year)
+                rep_a, num_rep = report(files, date_now_year, t_o)
                 await bot.send_message(message.chat.id, f"Посчитано {num_rep[0]} файл(ов)")
                 rep_masters = ""
                 for i in range(1, len(num_rep)):
@@ -58,7 +69,7 @@ async def echo_mess(message: types.Message):
                 et_serv = rep_a["et_serv"]
                 et_serv_tv = rep_a["et_serv_tv"]
 
-                answer = (f"ТО Запад {date_now_no_year} \n\n"
+                answer = (f"{t_o} {date_now_no_year} \n\n"
                           f"ЭХ: интернет {at_int}({at_int_pri} прив), сервис {at_serv} \n"
                           f"Тиера: интернет {ti_int}({ti_int_pri} прив), сервис {ti_serv} \n"
                           f"ЕТ: интернет {et_int}({et_int_pri} прив), "
@@ -73,26 +84,26 @@ async def echo_mess(message: types.Message):
                           f"сервис ТВ {et_serv_tv}")
                 await bot.send_message(message.chat.id, answer)
             else:
-                await bot.send_message(message.chat.id, f"Папка {date_now_year} не найдена!!!")
+                await bot.send_message(message.chat.id, f"Папка /{t_o}/{date_now_year} не найдена!!!")
 
-        elif message.text[0] == "у":
+        elif message.text[0].lower() == "у" or message.text[0].lower() == "y":  # Английская y
             search_date = message.text.split(" ")
             if len(search_date) > 1:
-                await bot.send_message(message.chat.id, f"Хотим удалить папку {search_date[1]}")
+                await bot.send_message(message.chat.id, f"Хотим удалить папку /{t_o}/{search_date[1]}")
                 try:
-                    shutil.rmtree(f"files/{search_date[1]}")
-                    print(f"/{search_date[1]} удален")
-                    await bot.send_message(message.chat.id, f"Папка {search_date[1]} удалена")
+                    shutil.rmtree(f"files/{t_o}/{search_date[1]}")
+                    print(f"/{t_o}/{search_date[1]} удален")
+                    await bot.send_message(message.chat.id, f"Папка /{t_o}/{search_date[1]} удалена")
                 except OSError as error:
                     print("Возникла ошибка.")
-                    await bot.send_message(message.chat.id, f"Папка {search_date[1]} не найдена!!!")
+                    await bot.send_message(message.chat.id, f"Папка /{t_o}/{search_date[1]} не найдена!!!")
             else:
                 await bot.send_message(message.chat.id, f"Дата не указана или указана не верно")
 
         else:
             # Создадим папку за текущий день если не существует
-            if not os.path.exists(f"files/{date_now_year}"):
-                os.makedirs(f"files/{date_now_year}")
+            if not os.path.exists(f"files/{t_o}/{date_now_year}"):
+                os.makedirs(f"files/{t_o}/{date_now_year}")
 
             txt = message.text.split(":")
             # Строчка ЭтХоум
@@ -238,10 +249,10 @@ async def echo_mess(message: types.Message):
                 to_save["master"] = "не указан"
 
             # Сохраним в файл
-            with open(f'files/{date_now_year}/{date_now}.json', 'w') as outfile:
+            with open(f'files/{t_o}/{date_now_year}/{date_now}.json', 'w') as outfile:
                 json.dump(to_save, outfile)
 
-            answe1 = (f"ТО Запад {date_now_no_year}. Мастер {to_save['master']} \n\n"
+            answe1 = (f"{t_o} {date_now_no_year}. Мастер {to_save['master']} \n\n"
                       f"ЭХ: интернет {at_int}({at_int_pri} прив), сервис {at_serv} \n" 
                       f"Тиера: интернет {ti_int}({ti_int_pri} прив), сервис {ti_serv} \n" 
                       f"ЕТ: интернет {et_int}({et_int_pri} прив), "
@@ -263,7 +274,7 @@ async def echo_mess(message: types.Message):
         await bot.send_message(message.chat.id, "Вы не авторизованны")
 
 
-def report(files, date):
+def report(files, date, t_o):
     to_save = {
         "at_int": 0,
         "at_int_pri": 0,
@@ -286,7 +297,7 @@ def report(files, date):
     rep = [0]
     # masters = []
     for file in files:
-        with open(f'files/{date}/{file}', 'r') as outfile:
+        with open(f'files/{t_o}/{date}/{file}', 'r') as outfile:
             data = json.load(outfile)
             print(data)
             to_save["at_int"] += data["at_int"]
@@ -310,7 +321,7 @@ def report(files, date):
 
     # Сохраним в файл
     # Хотя необходимости нет
-    with open(f'files/{date}.json', 'w') as outfile:
+    with open(f'files/{t_o}/{date}.json', 'w') as outfile:
         json.dump(to_save, outfile)
 
     return to_save, rep
