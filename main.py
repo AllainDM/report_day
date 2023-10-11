@@ -105,116 +105,250 @@ async def echo_mess(message: types.Message):
             if not os.path.exists(f"files/{t_o}/{date_now_year}"):
                 os.makedirs(f"files/{t_o}/{date_now_year}")
 
+            at_int = 0
+            at_int_pri = 0
+            at_serv = 0
+
+            ti_int = 0
+            ti_int_pri = 0
+            ti_serv = 0
+
+            et_int = 0
+            et_int_pri = 0
+            et_tv = 0
+            et_tv_pri = 0
+            et_dom = 0
+            et_dom_pri = 0
+            et_serv = 0
+            et_serv_tv = 0
+
+            # Разбиваем по ":", так мы определим провайдер
             txt = message.text.split(":")
+
             # Строчка ЭтХоум
-            new_txt_at = txt[1].replace("(", ")")
-            new_txt_at = new_txt_at.split(")")
+            print(f"тут1 {txt[1]}")
+            # Заменим скобки пробелами и разобьем на список
+            new_txt_at = txt[1].replace("(", " ").replace(")", " ").replace("\n", " ")
+            new_txt_at_list = new_txt_at.split(" ")
+            print(new_txt_at_list)
 
-            at_int_i = filter(str.isdecimal, new_txt_at[0])
-            at_int = ''.join(at_int_i)
-            try:
-                at_int = int(at_int)
-            except ValueError:
-                at_int = 0
+            # Сделаем перебор нового списка, где значения будем искать после ключевых слов
+            for num, val in enumerate(new_txt_at_list):
+                # print(f"111 {num, val}")
+                if val.lower() == "интернет":
+                    try:
+                        at_int = int(new_txt_at_list[num + 1])  # Следующее значение после "интернет"
+                    except ValueError:
+                        at_int = 0
+                elif val.lower() == "прив" or val.lower() == "привл":
+                    try:
+                        at_int_pri = int(new_txt_at_list[num - 1])  # Перед "прив"
+                    except ValueError:
+                        at_int_pri = 0
+                elif val.lower() == "сервис":
+                    try:
+                        at_serv = int(new_txt_at_list[num + 1])  # После "сервис"
+                    except ValueError:
+                        at_serv = 0
 
-            at_int_pri_i = filter(str.isdecimal, new_txt_at[1])
-            at_int_pri = ''.join(at_int_pri_i)
-            try:
-                at_int_pri = int(at_int_pri)
-            except ValueError:
-                at_int_pri = 0
+            # at_int_i = filter(str.isdecimal, new_txt_at[0])
+            # at_int = ''.join(at_int_i)
+            # try:
+            #     at_int = int(at_int)
+            # except ValueError:
+            #     at_int = 0
 
-            at_serv_i = filter(str.isdecimal, new_txt_at[2])
-            at_serv = ''.join(at_serv_i)
-            try:
-                at_serv = int(at_serv)
-            except ValueError:
-                at_serv = 0
+            # at_int_pri_i = filter(str.isdecimal, new_txt_at[1])
+            # at_int_pri = ''.join(at_int_pri_i)
+            # try:
+            #     at_int_pri = int(at_int_pri)
+            # except ValueError:
+            #     at_int_pri = 0
+
+            # at_serv_i = filter(str.isdecimal, new_txt_at[2])
+            # at_serv = ''.join(at_serv_i)
+            # try:
+            #     at_serv = int(at_serv)
+            # except ValueError:
+            #     at_serv = 0
 
             # Строчка Тиера
-            new_txt_ti = txt[2].replace("(", ")")
-            new_txt_ti = new_txt_ti.split(")")
+            new_txt_ti = txt[2].replace("(", " ").replace(")", " ").replace("\n", " ")
+            new_txt_ti_list = new_txt_ti.split(" ")
+            print(new_txt_ti_list)
 
-            ti_int_i = filter(str.isdecimal, new_txt_ti[0])
-            ti_int = ''.join(ti_int_i)
-            try:
-                ti_int = int(ti_int)
-            except ValueError:
-                ti_int = 0
+            # Сделаем перебор нового списка, где значения будем искать после ключевых слов
+            for num, val in enumerate(new_txt_ti_list):
+                # print(f"111 {num, val}")
+                if val.lower() == "интернет":
+                    try:
+                        ti_int = int(new_txt_ti_list[num + 1])  # Следующее значение после "интернет"
+                    except ValueError:
+                        ti_int = 0
+                elif val.lower() == "прив" or val.lower() == "привл":
+                    try:
+                        ti_int_pri = int(new_txt_ti_list[num - 1])  # Перед "прив"
+                    except ValueError:
+                        ti_int_pri = 0
+                elif val.lower() == "сервис":
+                    try:
+                        ti_serv = int(new_txt_ti_list[num + 1])  # После "сервис"
+                    except ValueError:
+                        ti_serv = 0
 
-            ti_int_pri_i = filter(str.isdecimal, new_txt_ti[1])
-            ti_int_pri = ''.join(ti_int_pri_i)
-            try:
-                ti_int_pri = int(ti_int_pri)
-            except ValueError:
-                ti_int_pri = 0
-
-            ti_serv_i = filter(str.isdecimal, new_txt_ti[2])
-            ti_serv = ''.join(ti_serv_i)
-            try:
-                ti_serv = int(ti_serv)
-            except ValueError:
-                ti_serv = 0
+            # ti_int_i = filter(str.isdecimal, new_txt_ti[0])
+            # ti_int = ''.join(ti_int_i)
+            # try:
+            #     ti_int = int(ti_int)
+            # except ValueError:
+            #     ti_int = 0
+            #
+            # ti_int_pri_i = filter(str.isdecimal, new_txt_ti[1])
+            # ti_int_pri = ''.join(ti_int_pri_i)
+            # try:
+            #     ti_int_pri = int(ti_int_pri)
+            # except ValueError:
+            #     ti_int_pri = 0
+            #
+            # ti_serv_i = filter(str.isdecimal, new_txt_ti[2])
+            # ti_serv = ''.join(ti_serv_i)
+            # try:
+            #     ti_serv = int(ti_serv)
+            # except ValueError:
+            #     ti_serv = 0
 
             # Строчка Е-телеком
-            new_txt_et = txt[3].replace("(", ")")
-            new_txt_et = new_txt_et.split(")")
+            new_txt_et = txt[3].replace("(", " ").replace(")", " ").replace("\n", " ")
+            new_txt_et_list = new_txt_et.split(" ")
+            print(new_txt_et_list)
 
-            et_int_i = filter(str.isdecimal, new_txt_et[0])
-            et_int = ''.join(et_int_i)
-            try:
-                et_int = int(et_int)
-            except ValueError:
-                et_int = 0
+            # Сделаем перебор нового списка, где значения будем искать после ключевых слов
+            # Сделаем несколько флагов, для разделения сервисов и привлеченных
+            flag_priv_int = 0
+            flag_priv_tv = 0
+            flag_priv_dom = 0
+            # flag_tv = 0
+            # flag_serv_int = 0
+            # flag_serv_tv = 0
 
-            et_int_pri_i = filter(str.isdecimal, new_txt_et[1])
-            et_int_pri = ''.join(et_int_pri_i)
-            try:
-                et_int_pri = int(et_int_pri)
-            except ValueError:
-                et_int_pri = 0
+            for num, val in enumerate(new_txt_et_list):
+                print(f"111 {num, val}")
+                if val.lower() == "интернет" and new_txt_et_list[num - 1].lower() != "сервис":
+                    print(f"тут интернет {new_txt_et_list[num + 1]}")
+                    try:
+                        et_int = int(new_txt_et_list[num + 1])  # Следующее значение после "интернет"
+                    except ValueError:
+                        et_int = 0
+                elif val.lower() == "прив" or val.lower() == "привл":
+                    if flag_priv_int == 0:  # Флаг привлеченного интернета
+                        print(f"тут прив интернет {new_txt_et_list[num - 1]}")
+                        flag_priv_int += 1
+                        try:
+                            et_int_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
+                        except ValueError:
+                            et_int_pri = 0
+                    elif flag_priv_tv == 0:  # Флаг привлеченного тв
+                        print(f"тут прив тв {new_txt_et_list[num - 1]}")
+                        flag_priv_tv += 1
+                        try:
+                            et_tv_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
+                        except ValueError:
+                            et_tv_pri = 0
+                    elif flag_priv_dom == 0:  # Флаг привлеченного домофона
+                        print(f"тут прив домофон {new_txt_et_list[num - 1]}")
+                        flag_priv_dom += 1
+                        try:
+                            et_dom_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
+                        except ValueError:
+                            et_dom_pri = 0
+                # Сочетание тв
+                elif val.lower() == "тв":
+                    if new_txt_et_list[num - 1].lower() == "сервис":
+                        print("тут сервис тв")
+                        try:
+                            et_serv_tv = int(new_txt_et_list[num + 1])  # После "тв"
+                        except ValueError:
+                            et_serv_tv = 0
+                        except IndexError:  # После сервисов тв часто не ставят значение, а это конец сообщения
+                            et_serv_tv = 0
+                    else:
+                        print("тут подключение тв")
+                        print(new_txt_et_list[num + 1])
+                        try:
+                            et_tv = int(new_txt_et_list[num + 1])  # После "тв"
+                        except ValueError:
+                            et_tv = 0
+                        except IndexError:  # После сервисов тв часто не ставят значение, а это конец сообщения
+                            et_tv = 0
+                elif val.lower() == "домофон":
+                    try:
+                        et_dom = int(new_txt_et_list[num + 1])  # После "тв"
+                    except ValueError:
+                        et_dom = 0
+                elif val.lower() == "сервис" and new_txt_et_list[num + 1].lower() == "интернет":
+                    try:
+                        et_serv = int(new_txt_et_list[num + 2])  # + 2
+                    except ValueError:
+                        et_serv = 0
 
-            et_tv_i = filter(str.isdecimal, new_txt_et[2])
-            et_tv = ''.join(et_tv_i)
-            try:
-                et_tv = int(et_tv)
-            except ValueError:
-                et_tv = 0
+            # new_txt_et = txt[3].replace("(", ")")
+            # new_txt_et = new_txt_et.split(")")
 
-            et_tv_pri_i = filter(str.isdecimal, new_txt_et[3])
-            et_tv_pri = ''.join(et_tv_pri_i)
-            try:
-                et_tv_pri = int(et_tv_pri)
-            except ValueError:
-                et_tv_pri = 0
+            # et_int_i = filter(str.isdecimal, new_txt_et[0])
+            # et_int = ''.join(et_int_i)
+            # try:
+            #     et_int = int(et_int)
+            # except ValueError:
+            #     et_int = 0
+            #
+            # et_int_pri_i = filter(str.isdecimal, new_txt_et[1])
+            # et_int_pri = ''.join(et_int_pri_i)
+            # try:
+            #     et_int_pri = int(et_int_pri)
+            # except ValueError:
+            #     et_int_pri = 0
+            #
+            # et_tv_i = filter(str.isdecimal, new_txt_et[2])
+            # et_tv = ''.join(et_tv_i)
+            # try:
+            #     et_tv = int(et_tv)
+            # except ValueError:
+            #     et_tv = 0
 
-            et_dom_i = filter(str.isdecimal, new_txt_et[4])
-            et_dom = ''.join(et_dom_i)
-            try:
-                et_dom = int(et_dom)
-            except ValueError:
-                et_dom = 0
+            # et_tv_pri_i = filter(str.isdecimal, new_txt_et[3])
+            # et_tv_pri = ''.join(et_tv_pri_i)
+            # try:
+            #     et_tv_pri = int(et_tv_pri)
+            # except ValueError:
+            #     et_tv_pri = 0
 
-            et_dom_pri_i = filter(str.isdecimal, new_txt_et[5])
-            et_dom_pri = ''.join(et_dom_pri_i)
-            try:
-                et_dom_pri = int(et_dom_pri)
-            except ValueError:
-                et_dom_pri = 0
+            # et_dom_i = filter(str.isdecimal, new_txt_et[4])
+            # et_dom = ''.join(et_dom_i)
+            # try:
+            #     et_dom = int(et_dom)
+            # except ValueError:
+            #     et_dom = 0
 
-            et_serv = filter(str.isdecimal, new_txt_et[6])
-            et_serv = ''.join(et_serv)
-            try:
-                et_serv = int(et_serv)
-            except ValueError:
-                et_serv = 0
+            # et_dom_pri_i = filter(str.isdecimal, new_txt_et[5])
+            # et_dom_pri = ''.join(et_dom_pri_i)
+            # try:
+            #     et_dom_pri = int(et_dom_pri)
+            # except ValueError:
+            #     et_dom_pri = 0
 
-            for_tv = txt[3].split("ТВ")
-            for_tv = for_tv[-1].split("(")
-            try:
-                et_serv_tv = int(for_tv[0])
-            except ValueError:
-                et_serv_tv = 0
+            # et_serv = filter(str.isdecimal, new_txt_et[6])
+            # et_serv = ''.join(et_serv)
+            # try:
+            #     et_serv = int(et_serv)
+            # except ValueError:
+            #     et_serv = 0
+            #
+            # for_tv = txt[3].split("ТВ")
+            # for_tv = for_tv[-1].split("(")
+            # try:
+            #     et_serv_tv = int(for_tv[0])
+            # except ValueError:
+            #     et_serv_tv = 0
 
             to_save = {
                 "at_int": at_int,
