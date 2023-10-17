@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 import json
 import shutil
@@ -18,6 +19,48 @@ if not os.path.exists(f"files/ТО Запад"):
     os.makedirs(f"files/ТО Запад")
 if not os.path.exists(f"files/ТО Север"):
     os.makedirs(f"files/ТО Север")
+
+
+# Тестовая функция для проверки даты
+@dp.message_handler(commands=['del'])
+async def echo_mess(message: types.Message):
+    # Получим ид пользователя и сравним со списком разрешенных в файле конфига
+    user_id = message.from_user.id
+    print(f"user_id {user_id}")
+    t_o = ""
+    if user_id in config.users:
+        # Определим ТО по ид юзера в телеграм
+        if user_id == 976374565:
+            t_o = "ТО Запад"
+        elif user_id == 652928171:
+            t_o = "ТО Север"
+        command = message.get_full_command()[1]  # [1].split('.')
+        print(command)
+        if len(command) == 10:
+            await bot.send_message(message.chat.id, f"Хотим удалить папку /{t_o}/{command}")
+            try:
+                shutil.rmtree(f"files/{t_o}/{command}")
+                print(f"/{t_o}/{command} удален")
+                await bot.send_message(message.chat.id, f"Папка /{t_o}/{command} удалена")
+            except OSError as error:
+                print("Возникла ошибка.")
+                await bot.send_message(message.chat.id, f"Папка /{t_o}/{command} не найдена!!!")
+        else:
+            await bot.send_message(message.chat.id, f"Дата не указана или указана не верно")
+
+    else:
+        await bot.send_message(message.chat.id, "Вы не авторизованны")
+    # else:
+    #     await bot.send_message(message.chat.id, f"Дата введена некорректно")
+    #
+    # await bot.send_message(message.chat.id, f"test")
+
+
+@dp.message_handler()
+async def echo_mess(edited_message: types.Message):
+    # Получим ид пользователя и сравним со списком разрешенных в файле конфига
+    user_id = edited_message.from_user.id
+    print(edited_message)
 
 
 @dp.message_handler()
@@ -127,8 +170,12 @@ async def echo_mess(message: types.Message):
 
             # Строчка ЭтХоум
             print(f"тут1 {txt[1]}")
-            # Заменим скобки пробелами и разобьем на список
-            new_txt_at = txt[1].replace("(", " ").replace(")", " ").replace("\n", " ")
+            # Заменим скобки и перенос строки пробелами и разобьем на список
+            new_txt_at = (txt[1].replace("(", " ").
+                          replace(")", " ").
+                          replace("\n", " ").
+                          replace(",", " ").
+                          replace(".", " "))
             new_txt_at_list = new_txt_at.split(" ")
             print(new_txt_at_list)
 
@@ -151,29 +198,12 @@ async def echo_mess(message: types.Message):
                     except ValueError:
                         at_serv = 0
 
-            # at_int_i = filter(str.isdecimal, new_txt_at[0])
-            # at_int = ''.join(at_int_i)
-            # try:
-            #     at_int = int(at_int)
-            # except ValueError:
-            #     at_int = 0
-
-            # at_int_pri_i = filter(str.isdecimal, new_txt_at[1])
-            # at_int_pri = ''.join(at_int_pri_i)
-            # try:
-            #     at_int_pri = int(at_int_pri)
-            # except ValueError:
-            #     at_int_pri = 0
-
-            # at_serv_i = filter(str.isdecimal, new_txt_at[2])
-            # at_serv = ''.join(at_serv_i)
-            # try:
-            #     at_serv = int(at_serv)
-            # except ValueError:
-            #     at_serv = 0
-
             # Строчка Тиера
-            new_txt_ti = txt[2].replace("(", " ").replace(")", " ").replace("\n", " ")
+            new_txt_ti = (txt[2].replace("(", " ").
+                          replace(")", " ").
+                          replace("\n", " ").
+                          replace(",", " ").
+                          replace(".", " "))
             new_txt_ti_list = new_txt_ti.split(" ")
             print(new_txt_ti_list)
 
@@ -196,29 +226,12 @@ async def echo_mess(message: types.Message):
                     except ValueError:
                         ti_serv = 0
 
-            # ti_int_i = filter(str.isdecimal, new_txt_ti[0])
-            # ti_int = ''.join(ti_int_i)
-            # try:
-            #     ti_int = int(ti_int)
-            # except ValueError:
-            #     ti_int = 0
-            #
-            # ti_int_pri_i = filter(str.isdecimal, new_txt_ti[1])
-            # ti_int_pri = ''.join(ti_int_pri_i)
-            # try:
-            #     ti_int_pri = int(ti_int_pri)
-            # except ValueError:
-            #     ti_int_pri = 0
-            #
-            # ti_serv_i = filter(str.isdecimal, new_txt_ti[2])
-            # ti_serv = ''.join(ti_serv_i)
-            # try:
-            #     ti_serv = int(ti_serv)
-            # except ValueError:
-            #     ti_serv = 0
-
             # Строчка Е-телеком
-            new_txt_et = txt[3].replace("(", " ").replace(")", " ").replace("\n", " ")
+            new_txt_et = (txt[3].replace("(", " ").
+                          replace(")", " ").
+                          replace("\n", " ").
+                          replace(",", " ").
+                          replace(".", " "))
             new_txt_et_list = new_txt_et.split(" ")
             print(new_txt_et_list)
 
@@ -290,65 +303,6 @@ async def echo_mess(message: types.Message):
                         et_serv = int(new_txt_et_list[num + 2])  # + 2
                     except ValueError:
                         et_serv = 0
-
-            # new_txt_et = txt[3].replace("(", ")")
-            # new_txt_et = new_txt_et.split(")")
-
-            # et_int_i = filter(str.isdecimal, new_txt_et[0])
-            # et_int = ''.join(et_int_i)
-            # try:
-            #     et_int = int(et_int)
-            # except ValueError:
-            #     et_int = 0
-            #
-            # et_int_pri_i = filter(str.isdecimal, new_txt_et[1])
-            # et_int_pri = ''.join(et_int_pri_i)
-            # try:
-            #     et_int_pri = int(et_int_pri)
-            # except ValueError:
-            #     et_int_pri = 0
-            #
-            # et_tv_i = filter(str.isdecimal, new_txt_et[2])
-            # et_tv = ''.join(et_tv_i)
-            # try:
-            #     et_tv = int(et_tv)
-            # except ValueError:
-            #     et_tv = 0
-
-            # et_tv_pri_i = filter(str.isdecimal, new_txt_et[3])
-            # et_tv_pri = ''.join(et_tv_pri_i)
-            # try:
-            #     et_tv_pri = int(et_tv_pri)
-            # except ValueError:
-            #     et_tv_pri = 0
-
-            # et_dom_i = filter(str.isdecimal, new_txt_et[4])
-            # et_dom = ''.join(et_dom_i)
-            # try:
-            #     et_dom = int(et_dom)
-            # except ValueError:
-            #     et_dom = 0
-
-            # et_dom_pri_i = filter(str.isdecimal, new_txt_et[5])
-            # et_dom_pri = ''.join(et_dom_pri_i)
-            # try:
-            #     et_dom_pri = int(et_dom_pri)
-            # except ValueError:
-            #     et_dom_pri = 0
-
-            # et_serv = filter(str.isdecimal, new_txt_et[6])
-            # et_serv = ''.join(et_serv)
-            # try:
-            #     et_serv = int(et_serv)
-            # except ValueError:
-            #     et_serv = 0
-            #
-            # for_tv = txt[3].split("ТВ")
-            # for_tv = for_tv[-1].split("(")
-            # try:
-            #     et_serv_tv = int(for_tv[0])
-            # except ValueError:
-            #     et_serv_tv = 0
 
             to_save = {
                 "at_int": at_int,
@@ -459,11 +413,6 @@ def report(files, date, t_o):
         json.dump(to_save, outfile)
 
     return to_save, rep
-
-
-# def to_save_json(date, to_save):
-#     with open(f'files/{date}.json', 'w') as outfile:
-#         json.dump(to_save, outfile)
 
 
 if __name__ == '__main__':
