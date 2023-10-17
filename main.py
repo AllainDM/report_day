@@ -57,13 +57,6 @@ async def echo_mess(message: types.Message):
 
 
 @dp.message_handler()
-async def echo_mess(edited_message: types.Message):
-    # Получим ид пользователя и сравним со списком разрешенных в файле конфига
-    user_id = edited_message.from_user.id
-    print(edited_message)
-
-
-@dp.message_handler()
 async def echo_mess(message: types.Message):
     # Получим ид пользователя и сравним со списком разрешенных в файле конфига
     user_id = message.from_user.id
