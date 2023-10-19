@@ -5,6 +5,7 @@ import shutil
 import os
 
 from aiogram import Bot, Dispatcher, types, executor
+import xlwt
 
 import config
 
@@ -75,7 +76,7 @@ async def echo_mess(message: types.Message):
         print(date_ago)
         date_now_year = date_ago.strftime("%d.%m.%Y")
         date_now_no_year = date_ago.strftime("%d.%m")
-
+        # Функция отправки отчета в телеграм по уже собранным данным
         if message.text == "1" or message.text == "отчет" or message.text == "отчёт":
             await bot.send_message(message.chat.id, f"Готовим отчет")
             if os.path.exists(f"files/{t_o}/{date_now_year}"):
@@ -83,10 +84,18 @@ async def echo_mess(message: types.Message):
                 await bot.send_message(message.chat.id, f"Найдено {len(files)} файл(ов)")
                 rep_a, num_rep = report(files, date_now_year, t_o)
                 await bot.send_message(message.chat.id, f"Посчитано {num_rep[0]} файл(ов)")
+                # Сохраним ексель файл с номерами ремонтов
+                save_to_exel(rep_a, t_o, date_now_year)
+                # Попробуем отправить файл
+                exel = open(f"files/{t_o}/{date_now_year}/{date_now_year}.xls", "rb")
+                await bot.send_document(message.chat.id, exel)
+
+                # Выведем имена мастеров для сверки
                 rep_masters = ""
                 for i in range(1, len(num_rep)):
                     rep_masters += f'{num_rep[i]} \n'
                 await bot.send_message(message.chat.id, rep_masters)
+
                 print(files)
                 at_int = rep_a["at_int"]
                 at_int_pri = rep_a["at_int_pri"]
@@ -135,7 +144,7 @@ async def echo_mess(message: types.Message):
                     await bot.send_message(message.chat.id, f"Папка /{t_o}/{search_date[1]} не найдена!!!")
             else:
                 await bot.send_message(message.chat.id, f"Дата не указана или указана не верно")
-
+        # Парсер сообщений и сохранение в файл
         else:
             # Создадим папку за текущий день если не существует
             if not os.path.exists(f"files/{t_o}/{date_now_year}"):
@@ -238,7 +247,7 @@ async def echo_mess(message: types.Message):
             # flag_serv_tv = 0
 
             for num, val in enumerate(new_txt_et_list):
-                print(f"111 {num, val}")
+                # print(f"111 {num, val}")
                 if val.lower() == "интернет" and new_txt_et_list[num - 1].lower() != "сервис":
                     print(f"тут интернет {new_txt_et_list[num + 1]}")
                     try:
@@ -329,9 +338,75 @@ async def echo_mess(message: types.Message):
             else:
                 to_save["master"] = "не указан"
 
+            # Так же создадим список для сохранения номеров ремонтов
+            list_repairs = []
+
+            # После получения мастера соберем список ремонтов
+            # Запишем номера ремонтов в ЭтХоум
+            # Заменим скобки и перенос строки пробелами и разобьем на список
+            repairs_txt_at = (txt[1].replace("(", " ").
+                              replace(")", " ").
+                              replace("\n", " ").
+                              replace("#", " ").
+                              replace("e", " ").        # Английская. Тут мастера могут записать етм
+                              replace("е", " ").        # Русская
+                              replace(",", " ").
+                              replace(".", " "))
+            repairs_txt_at_list = repairs_txt_at.split(" ")
+
+            for i in repairs_txt_at_list:
+                if len(i) == 7 and i.isnumeric():
+                    print(f"i1 {i}")
+                    list_repairs.append(['ЭтХоум', i, to_save["master"]])
+                # else:
+                #     print(f"{i} не подходит")
+
+            # Запишем номера ремонтов в Тиере
+            # Заменим скобки и перенос строки пробелами и разобьем на список
+            repairs_txt_ti = (txt[2].replace("(", " ").
+                              replace(")", " ").
+                              replace("\n", " ").
+                              replace("#", " ").
+                              replace("e", " ").        # Английская. Тут мастера могут записать етм
+                              replace("е", " ").        # Русская
+                              replace(",", " ").
+                              replace(".", " "))
+            repairs_txt_ti_list = repairs_txt_ti.split(" ")
+
+            for i in repairs_txt_ti_list:
+                if len(i) == 7 and i.isnumeric():
+                    print(f"i2 {i}")
+                    list_repairs.append(['Тиера', i, to_save["master"]])
+                # else:
+                #     print(f"{i} не подходит")
+
+            # Запишем номера ремонтов в ЕТ
+            # Заменим скобки и перенос строки пробелами и разобьем на список
+            repairs_txt_et = (txt[3].replace("(", " ").
+                              replace(")", " ").
+                              replace("\n", " ").
+                              replace("#", " ").
+                              replace("e", " ").        # Английская. Тут мастера могут записать етм
+                              replace("е", " ").        # Русская
+                              replace(",", " ").
+                              replace(".", " "))
+            repairs_txt_et_list = repairs_txt_et.split(" ")
+            print(f"repairs_txt_et {repairs_txt_et}")
+
+            for i in repairs_txt_et_list:
+                if len(i) == 7 and i.isnumeric():
+                    print(f"i3 {i}")
+                    list_repairs.append(['ЕТ', i, to_save["master"]])
+                # else:
+                #     print(f"{i} не подходит")
+
+            # Добавим к сохраняемым данным список с ремонтами
+
+            to_save["list_repairs"] = list_repairs
+
             # Сохраним в файл
             with open(f'files/{t_o}/{date_now_year}/{date_now}.json', 'w') as outfile:
-                json.dump(to_save, outfile)
+                json.dump(to_save, outfile, sort_keys=False, ensure_ascii=False, indent=4, separators=(',', ': '))
 
             answe1 = (f"{t_o} {date_now_no_year}. Мастер {to_save['master']} \n\n"
                       f"ЭХ: интернет {at_int}({at_int_pri} прив), сервис {at_serv} \n" 
@@ -348,11 +423,33 @@ async def echo_mess(message: types.Message):
                       f"сервис ТВ {et_serv_tv}")
 
             print(answe1)
-
             await bot.send_message(message.chat.id, f"{answe1}")
 
     else:
         await bot.send_message(message.chat.id, "Вы не авторизованны")
+
+
+def save_to_exel(list_to_exel, t_o, date):
+    wb = xlwt.Workbook()
+    # ws = wb.add_sheet(f'{table_name}')
+    ws = wb.add_sheet(date)
+    print(f"list_repairs {list_to_exel['list_repairs']}")
+
+    for n, v in enumerate(list_to_exel["list_repairs"]):
+        ws.write(n, 0, v[0])  # Бренд
+        ws.write(n, 1, date)  # Дата
+        ws.write(n, 3, v[1])  # Номер
+        ws.write(n, 7, v[2])  # Мастер
+        ws.write(n, 17, f"=ГИПЕРССЫЛКА(CONCAT($Y$2;D{n+1});D{n+1})")  # Ссылка
+
+    # Гиперссылка
+    ws.write(1, 24, "https://us.gblnet.net/oper/?core_section=task&action=show&id=")
+
+    # date_now = datetime.now()
+    # ws.write(0, 0, f"Версия 005 Время: {date_now}")
+
+    wb.save(f'files/{t_o}/{date}/{date}.xls')
+    print("Документ сохранен")
 
 
 def report(files, date, t_o):
@@ -372,38 +469,47 @@ def report(files, date, t_o):
         "et_dom": 0,
         "et_dom_pri": 0,
         "et_serv": 0,
-        "et_serv_tv": 0
+        "et_serv_tv": 0,
+        "list_repairs": []
     }
     # Возвращаем количество отчетов для сверки. Первый индекс количество, остальные фамилии мастеров
     rep = [0]
     # masters = []
     for file in files:
-        with open(f'files/{t_o}/{date}/{file}', 'r') as outfile:
-            data = json.load(outfile)
-            print(data)
-            to_save["at_int"] += data["at_int"]
-            to_save["at_int_pri"] += data["at_int_pri"]
-            to_save["at_serv"] += data["at_serv"]
+        print(f"Попробуем наладить фильтр по названию файла {file}")
+        print(f"Попробуем наладить фильтр по названию файла {file[-4:]}")
+        if file[-4:] == "json":
+            with open(f'files/{t_o}/{date}/{file}', 'r', encoding='utf-8') as outfile:
+                # , errors='ignore'
+                # data = json.load(outfile)
+                print(f"будем искать такой файл: {file}")
+                data = json.loads(outfile.read())
+                print(data)
+                to_save["at_int"] += data["at_int"]
+                to_save["at_int_pri"] += data["at_int_pri"]
+                to_save["at_serv"] += data["at_serv"]
 
-            to_save["ti_int"] += data["ti_int"]
-            to_save["ti_int_pri"] += data["ti_int_pri"]
-            to_save["ti_serv"] += data["ti_serv"]
+                to_save["ti_int"] += data["ti_int"]
+                to_save["ti_int_pri"] += data["ti_int_pri"]
+                to_save["ti_serv"] += data["ti_serv"]
 
-            to_save["et_int"] += data["et_int"]
-            to_save["et_int_pri"] += data["et_int_pri"]
-            to_save["et_tv"] += data["et_tv"]
-            to_save["et_tv_pri"] += data["et_tv_pri"]
-            to_save["et_dom"] += data["et_dom"]
-            to_save["et_dom_pri"] += data["et_dom_pri"]
-            to_save["et_serv"] += data["et_serv"]
-            to_save["et_serv_tv"] += data["et_serv_tv"]
-            rep[0] += 1  # Добавим счетчик количества посчитанных
-            rep.append(data["master"])  # Добавим фамилию мастера
+                to_save["et_int"] += data["et_int"]
+                to_save["et_int_pri"] += data["et_int_pri"]
+                to_save["et_tv"] += data["et_tv"]
+                to_save["et_tv_pri"] += data["et_tv_pri"]
+                to_save["et_dom"] += data["et_dom"]
+                to_save["et_dom_pri"] += data["et_dom_pri"]
+                to_save["et_serv"] += data["et_serv"]
+                to_save["et_serv_tv"] += data["et_serv_tv"]
+                rep[0] += 1  # Добавим счетчик количества посчитанных
+                rep.append(data["master"])  # Добавим фамилию мастера
+                # Сложим так же все номера ремонтов
+                to_save["list_repairs"] += data["list_repairs"]
 
     # Сохраним в файл
     # Хотя необходимости нет
     with open(f'files/{t_o}/{date}.json', 'w') as outfile:
-        json.dump(to_save, outfile)
+        json.dump(to_save, outfile, sort_keys=False, ensure_ascii=False, indent=4, separators=(',', ': '))
 
     return to_save, rep
 
