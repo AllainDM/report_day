@@ -167,6 +167,24 @@ async def echo_mess(message: types.Message):
             et_serv = 0
             et_serv_tv = 0
 
+            # Создадим флаги для поиска ошибок
+            at_int_flag = 0
+            at_int_pri_flag = 0
+            at_serv_flag = 0
+
+            ti_int_flag = 0
+            ti_int_pri_flag = 0
+            ti_serv_flag = 0
+
+            et_int_flag = 0
+            et_int_pri_flag = 0
+            et_tv_flag = 0
+            et_tv_pri_flag = 0
+            et_dom_flag = 0
+            et_dom_pri_flag = 0
+            et_serv_flag = 0
+            et_serv_tv_flag = 0
+
             # Разбиваем по ":", так мы определим провайдер
             txt = message.text.split(":")
 
@@ -187,16 +205,19 @@ async def echo_mess(message: types.Message):
                 if val.lower() == "интернет":
                     try:
                         at_int = int(new_txt_at_list[num + 1])  # Следующее значение после "интернет"
+                        at_int_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         at_int = 0
                 elif val.lower() == "прив" or val.lower() == "привл":
                     try:
                         at_int_pri = int(new_txt_at_list[num - 1])  # Перед "прив"
+                        at_int_pri_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         at_int_pri = 0
                 elif val.lower() == "сервис":
                     try:
                         at_serv = int(new_txt_at_list[num + 1])  # После "сервис"
+                        at_serv_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         at_serv = 0
 
@@ -215,16 +236,19 @@ async def echo_mess(message: types.Message):
                 if val.lower() == "интернет":
                     try:
                         ti_int = int(new_txt_ti_list[num + 1])  # Следующее значение после "интернет"
+                        ti_int_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         ti_int = 0
                 elif val.lower() == "прив" or val.lower() == "привл":
                     try:
                         ti_int_pri = int(new_txt_ti_list[num - 1])  # Перед "прив"
+                        ti_int_pri_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         ti_int_pri = 0
                 elif val.lower() == "сервис":
                     try:
                         ti_serv = int(new_txt_ti_list[num + 1])  # После "сервис"
+                        ti_serv_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         ti_serv = 0
 
@@ -252,6 +276,7 @@ async def echo_mess(message: types.Message):
                     print(f"тут интернет {new_txt_et_list[num + 1]}")
                     try:
                         et_int = int(new_txt_et_list[num + 1])  # Следующее значение после "интернет"
+                        et_int_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         et_int = 0
                 elif val.lower() == "прив" or val.lower() == "привл":
@@ -260,6 +285,7 @@ async def echo_mess(message: types.Message):
                         flag_priv_int += 1
                         try:
                             et_int_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
+                            et_int_pri_flag = 1  # Флаг для проверки правильности отчета
                         except ValueError:
                             et_int_pri = 0
                     elif flag_priv_tv == 0:  # Флаг привлеченного тв
@@ -267,6 +293,7 @@ async def echo_mess(message: types.Message):
                         flag_priv_tv += 1
                         try:
                             et_tv_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
+                            et_tv_pri_flag = 1  # Флаг для проверки правильности отчета
                         except ValueError:
                             et_tv_pri = 0
                     elif flag_priv_dom == 0:  # Флаг привлеченного домофона
@@ -274,6 +301,7 @@ async def echo_mess(message: types.Message):
                         flag_priv_dom += 1
                         try:
                             et_dom_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
+                            et_dom_pri_flag = 1  # Флаг для проверки правильности отчета
                         except ValueError:
                             et_dom_pri = 0
                 # Сочетание тв
@@ -282,6 +310,7 @@ async def echo_mess(message: types.Message):
                         print("тут сервис тв")
                         try:
                             et_serv_tv = int(new_txt_et_list[num + 1])  # После "тв"
+                            et_serv_tv_flag = 1  # Флаг для проверки правильности отчета
                         except ValueError:
                             et_serv_tv = 0
                         except IndexError:  # После сервисов тв часто не ставят значение, а это конец сообщения
@@ -291,6 +320,7 @@ async def echo_mess(message: types.Message):
                         print(new_txt_et_list[num + 1])
                         try:
                             et_tv = int(new_txt_et_list[num + 1])  # После "тв"
+                            et_tv_flag = 1  # Флаг для проверки правильности отчета
                         except ValueError:
                             et_tv = 0
                         except IndexError:  # После сервисов тв часто не ставят значение, а это конец сообщения
@@ -298,11 +328,13 @@ async def echo_mess(message: types.Message):
                 elif val.lower() == "домофон":
                     try:
                         et_dom = int(new_txt_et_list[num + 1])  # После "тв"
+                        et_dom_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         et_dom = 0
                 elif val.lower() == "сервис" and new_txt_et_list[num + 1].lower() == "интернет":
                     try:
                         et_serv = int(new_txt_et_list[num + 2])  # + 2
+                        et_serv_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         et_serv = 0
 
@@ -323,7 +355,8 @@ async def echo_mess(message: types.Message):
                 "et_dom_pri": et_dom_pri,
                 "et_serv": et_serv,
                 "et_serv_tv": et_serv_tv,
-                'master': "не указан"
+                'master': "не указан",
+                'msg_err_txt': ""  # Запись текста с возможными ошибками
             }
 
             print(message)
@@ -337,6 +370,80 @@ async def echo_mess(message: types.Message):
                 to_save["master"] = message.forward_sender_name
             else:
                 to_save["master"] = "не указан"
+
+            # Выставим мастера вручную
+            if to_save["master"] == "Sergey":
+                to_save["master"] = "Дьяков"
+            elif to_save["master"] == "Александр ЛюТЫй":
+                to_save["master"] = "Михайлюта"
+            elif to_save["master"] == "Vladimir":
+                to_save["master"] = "Рябов"
+            elif to_save["master"] == "Сеня":
+                to_save["master"] = "Федоров"
+            elif to_save["master"] == "Vitaly":
+                to_save["master"] = "Ким"
+            elif to_save["master"] == "Koma":
+                to_save["master"] = "Комаревцев"
+            elif to_save["master"] == "Рус":
+                to_save["master"] = "Хуснутдинов"
+            elif to_save["master"] == "Тимур":
+                to_save["master"] = "Давлетшин"
+            elif to_save["master"] == "Антон Erk0o":
+                to_save["master"] = "Митюхин"
+            elif to_save["master"] == "Anatoliy Chernykh":
+                to_save["master"] = "Черных"
+            elif to_save["master"] == "Князь Владимир":
+                to_save["master"] = "Гончар"
+            elif to_save["master"] == "Бодашков Евгений Борисович":
+                to_save["master"] = "Бодашков"
+
+            # Сообщение об ошибке на основе флагов
+            msg_err = []
+            # msg_err_txt = ""
+
+            if at_int_flag == 0:
+                msg_err.append("ЭтХоум интернет. ")
+
+            if at_int_pri_flag == 0:
+                msg_err.append("ЭтХоум интернет привлеченный. ")
+            if at_serv_flag == 0:
+                msg_err.append("ЭтХоум сервис. ")
+
+            if ti_int_flag == 0:
+                msg_err.append("Тиера интернет. ")
+            if ti_int_pri_flag == 0:
+                msg_err.append("Тиера интернет привлеченный. ")
+            if ti_serv_flag == 0:
+                msg_err.append("Тиера сервис. ")
+
+            if et_int_flag == 0:
+                msg_err.append("ЕТ интернет. ")
+            if et_int_pri_flag == 0:
+                msg_err.append("ЕТ интернет привлеченный. ")
+            if et_tv_flag == 0:
+                msg_err.append("ЕТ тв. ")
+            if et_tv_pri_flag == 0:
+                msg_err.append("ЕТ тв привлеченный. ")
+            if et_dom_flag == 0:
+                msg_err.append("ЕТ домофон. ")
+            if et_dom_pri_flag == 0:
+                msg_err.append("ЕТ домофон привлеченный. ")
+            if et_serv_flag == 0:
+                msg_err.append("ЕТ сервис. ")
+            if et_serv_tv_flag == 0:
+                msg_err.append("ЕТ сервис тв. ")
+
+            if len(msg_err) > 0:
+                msg_err_txt = f""
+                for e in msg_err:
+                    msg_err_txt += e
+                # Стандартный текст передается тут, а не сохраняется
+                await bot.send_message(message.chat.id,
+                                       f"Внимание, возможна ошибка с отчетом мастера "
+                                       f"{to_save['master']}: {msg_err_txt}")
+
+                # Сохраним имя мастера и ошибки в файл, для доп вывода при запросе общего за 1 день
+                to_save["msg_err_txt"] = f"{to_save['master']} {msg_err_txt}. "
 
             # Так же создадим список для сохранения номеров ремонтов
             list_repairs = []
@@ -470,7 +577,8 @@ def report(files, date, t_o):
         "et_dom_pri": 0,
         "et_serv": 0,
         "et_serv_tv": 0,
-        "list_repairs": []
+        "list_repairs": [],
+        "msg_err_txt": []
     }
     # Возвращаем количество отчетов для сверки. Первый индекс количество, остальные фамилии мастеров
     rep = [0]
