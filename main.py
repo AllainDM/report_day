@@ -195,6 +195,7 @@ async def echo_mess(message: types.Message):
                           replace(")", " ").
                           replace("\n", " ").
                           replace(",", " ").
+                          replace("\xa0", " ").
                           replace(".", " "))
             new_txt_at_list = new_txt_at.split(" ")
             print(new_txt_at_list)
@@ -226,6 +227,7 @@ async def echo_mess(message: types.Message):
                           replace(")", " ").
                           replace("\n", " ").
                           replace(",", " ").
+                          replace("\xa0", " ").
                           replace(".", " "))
             new_txt_ti_list = new_txt_ti.split(" ")
             print(new_txt_ti_list)
@@ -257,6 +259,7 @@ async def echo_mess(message: types.Message):
                           replace(")", " ").
                           replace("\n", " ").
                           replace(",", " ").
+                          replace("\xa0", " ").
                           replace(".", " "))
             new_txt_et_list = new_txt_et.split(" ")
             print(new_txt_et_list)
@@ -327,7 +330,7 @@ async def echo_mess(message: types.Message):
                             et_tv = 0
                 elif val.lower() == "домофон":
                     try:
-                        et_dom = int(new_txt_et_list[num + 1])  # После "тв"
+                        et_dom = int(new_txt_et_list[num + 1])  # После "домофон"
                         et_dom_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         et_dom = 0
@@ -458,6 +461,7 @@ async def echo_mess(message: types.Message):
                               replace("e", " ").        # Английская. Тут мастера могут записать етм
                               replace("е", " ").        # Русская
                               replace(",", " ").
+                              replace("\xa0", " ").
                               replace(".", " "))
             repairs_txt_at_list = repairs_txt_at.split(" ")
 
@@ -477,6 +481,7 @@ async def echo_mess(message: types.Message):
                               replace("e", " ").        # Английская. Тут мастера могут записать етм
                               replace("е", " ").        # Русская
                               replace(",", " ").
+                              replace("\xa0", " ").
                               replace(".", " "))
             repairs_txt_ti_list = repairs_txt_ti.split(" ")
 
@@ -496,6 +501,7 @@ async def echo_mess(message: types.Message):
                               replace("e", " ").        # Английская. Тут мастера могут записать етм
                               replace("е", " ").        # Русская
                               replace(",", " ").
+                              replace("\xa0", " ").
                               replace(".", " "))
             repairs_txt_et_list = repairs_txt_et.split(" ")
             print(f"repairs_txt_et {repairs_txt_et}")
