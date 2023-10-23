@@ -393,12 +393,32 @@ async def echo_mess(message: types.Message):
                 to_save["master"] = "Давлетшин"
             elif to_save["master"] == "Антон Erk0o":
                 to_save["master"] = "Митюхин"
+            elif to_save["master"] == "Jack":
+                to_save["master"] = "Янюк"
+            elif to_save["master"] == "B":
+                to_save["master"] = "Бондаренко"
+            elif to_save["master"] == "mifik":
+                to_save["master"] = "Минаков"
+            elif to_save["master"] == "Леонид":
+                to_save["master"] = "Алексеев"
+
             elif to_save["master"] == "Anatoliy Chernykh":
                 to_save["master"] = "Черных"
             elif to_save["master"] == "Князь Владимир":
                 to_save["master"] = "Гончар"
             elif to_save["master"] == "Бодашков Евгений Борисович":
                 to_save["master"] = "Бодашков"
+            elif to_save["master"] == "Nikitin":
+                to_save["master"] = "Никитин"
+            elif to_save["master"] == "Ailing":
+                to_save["master"] = "Коряков"
+            elif to_save["master"] == "ilya":
+                to_save["master"] = "Никифоров"
+
+            # Но, если в начале сообщения есть фамилия, то возьмем ее.
+            txt_soname = txt[0].split(" ")
+            if txt_soname[0].lower() != 'эх':
+                to_save["master"] = txt_soname[0]
 
             # Сообщение об ошибке на основе флагов
             msg_err = []
