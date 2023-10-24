@@ -209,7 +209,7 @@ async def echo_mess(message: types.Message):
                         at_int_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         at_int = 0
-                elif val.lower() == "прив" or val.lower() == "привл":
+                elif val[0:4].lower() == "прив":  # or val[0:5].lower() == "привл"
                     try:
                         at_int_pri = int(new_txt_at_list[num - 1])  # Перед "прив"
                         at_int_pri_flag = 1  # Флаг для проверки правильности отчета
@@ -241,7 +241,7 @@ async def echo_mess(message: types.Message):
                         ti_int_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         ti_int = 0
-                elif val.lower() == "прив" or val.lower() == "привл":
+                elif val[0:4].lower() == "прив":
                     try:
                         ti_int_pri = int(new_txt_ti_list[num - 1])  # Перед "прив"
                         ti_int_pri_flag = 1  # Флаг для проверки правильности отчета
@@ -282,7 +282,9 @@ async def echo_mess(message: types.Message):
                         et_int_flag = 1  # Флаг для проверки правильности отчета
                     except ValueError:
                         et_int = 0
-                elif val.lower() == "прив" or val.lower() == "привл":
+                elif val[0:4].lower() == "прив":
+                    print(f" тут какой то val1 {val}")
+                    print(f" тут какой то val2 {val[0:4]}")
                     if flag_priv_int == 0:  # Флаг привлеченного интернета
                         # print(f"тут прив интернет {new_txt_et_list[num - 1]}")
                         flag_priv_int += 1
