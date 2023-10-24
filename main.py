@@ -189,7 +189,7 @@ async def echo_mess(message: types.Message):
             txt = message.text.split(":")
 
             # Строчка ЭтХоум
-            print(f"тут1 {txt[1]}")
+            # print(f"тут1 {txt[1]}")
             # Заменим скобки и перенос строки пробелами и разобьем на список
             new_txt_at = (txt[1].replace("(", " ").
                           replace(")", " ").
@@ -276,7 +276,7 @@ async def echo_mess(message: types.Message):
             for num, val in enumerate(new_txt_et_list):
                 # print(f"111 {num, val}")
                 if val.lower() == "интернет" and new_txt_et_list[num - 1].lower() != "сервис":
-                    print(f"тут интернет {new_txt_et_list[num + 1]}")
+                    # print(f"тут интернет {new_txt_et_list[num + 1]}")
                     try:
                         et_int = int(new_txt_et_list[num + 1])  # Следующее значение после "интернет"
                         et_int_flag = 1  # Флаг для проверки правильности отчета
@@ -284,7 +284,7 @@ async def echo_mess(message: types.Message):
                         et_int = 0
                 elif val.lower() == "прив" or val.lower() == "привл":
                     if flag_priv_int == 0:  # Флаг привлеченного интернета
-                        print(f"тут прив интернет {new_txt_et_list[num - 1]}")
+                        # print(f"тут прив интернет {new_txt_et_list[num - 1]}")
                         flag_priv_int += 1
                         try:
                             et_int_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
@@ -292,7 +292,7 @@ async def echo_mess(message: types.Message):
                         except ValueError:
                             et_int_pri = 0
                     elif flag_priv_tv == 0:  # Флаг привлеченного тв
-                        print(f"тут прив тв {new_txt_et_list[num - 1]}")
+                        # print(f"тут прив тв {new_txt_et_list[num - 1]}")
                         flag_priv_tv += 1
                         try:
                             et_tv_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
@@ -300,7 +300,7 @@ async def echo_mess(message: types.Message):
                         except ValueError:
                             et_tv_pri = 0
                     elif flag_priv_dom == 0:  # Флаг привлеченного домофона
-                        print(f"тут прив домофон {new_txt_et_list[num - 1]}")
+                        # print(f"тут прив домофон {new_txt_et_list[num - 1]}")
                         flag_priv_dom += 1
                         try:
                             et_dom_pri = int(new_txt_et_list[num - 1])  # Перед "прив"
@@ -310,7 +310,7 @@ async def echo_mess(message: types.Message):
                 # Сочетание тв
                 elif val.lower() == "тв":
                     if new_txt_et_list[num - 1].lower() == "сервис":
-                        print("тут сервис тв")
+                        # print("тут сервис тв")
                         try:
                             et_serv_tv = int(new_txt_et_list[num + 1])  # После "тв"
                             et_serv_tv_flag = 1  # Флаг для проверки правильности отчета
@@ -319,8 +319,8 @@ async def echo_mess(message: types.Message):
                         except IndexError:  # После сервисов тв часто не ставят значение, а это конец сообщения
                             et_serv_tv = 0
                     else:
-                        print("тут подключение тв")
-                        print(new_txt_et_list[num + 1])
+                        # print("тут подключение тв")
+                        # print(new_txt_et_list[num + 1])
                         try:
                             et_tv = int(new_txt_et_list[num + 1])  # После "тв"
                             et_tv_flag = 1  # Флаг для проверки правильности отчета
@@ -416,7 +416,8 @@ async def echo_mess(message: types.Message):
                 to_save["master"] = "Никифоров"
 
             # Но, если в начале сообщения есть фамилия, то возьмем ее.
-            txt_soname = txt[0].split(" ")
+            txt_soname_pre = txt[0].replace("\n", " ")
+            txt_soname = txt_soname_pre.split(" ")
             if txt_soname[0].lower() != 'эх':
                 to_save["master"] = txt_soname[0]
 
@@ -528,7 +529,7 @@ async def echo_mess(message: types.Message):
 
             for i in repairs_txt_et_list:
                 if len(i) == 7 and i.isnumeric():
-                    print(f"i3 {i}")
+                    # print(f"i3 {i}")
                     list_repairs.append(['ЕТ', i, to_save["master"]])
                 # else:
                 #     print(f"{i} не подходит")
