@@ -186,7 +186,16 @@ async def echo_mess(message: types.Message):
             et_serv_tv_flag = 0
 
             # Разбиваем по ":", так мы определим провайдер
-            txt = message.text.split(":")
+            pre_txt_lower = message.text.lower()
+            print(f"pre_txt_lower {pre_txt_lower}")
+            pre_txt_lower = (pre_txt_lower.replace("эх:", ":::").
+                             replace("тиера:", ":::").
+                             replace("нет:", "нет").
+                             replace("ет:", ":::"))
+            print(f"pre_txt_lower {pre_txt_lower}")
+            # txt = message.text.split(":")
+            txt = pre_txt_lower.split(":::")
+            print(f"txt {txt}")
 
             # Строчка ЭтХоум
             # print(f"тут1 {txt[1]}")
@@ -195,6 +204,7 @@ async def echo_mess(message: types.Message):
                           replace(")", " ").
                           replace("\n", " ").
                           replace(",", " ").
+                          replace(":", "").
                           replace("\xa0", " ").
                           replace(".", " "))
             new_txt_at_list = new_txt_at.split(" ")
@@ -227,6 +237,7 @@ async def echo_mess(message: types.Message):
                           replace(")", " ").
                           replace("\n", " ").
                           replace(",", " ").
+                          replace(":", "").
                           replace("\xa0", " ").
                           replace(".", " "))
             new_txt_ti_list = new_txt_ti.split(" ")
@@ -259,6 +270,7 @@ async def echo_mess(message: types.Message):
                           replace(")", " ").
                           replace("\n", " ").
                           replace(",", " ").
+                          replace(":", "").
                           replace("\xa0", " ").
                           replace(".", " "))
             new_txt_et_list = new_txt_et.split(" ")
