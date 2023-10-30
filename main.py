@@ -188,13 +188,13 @@ async def echo_mess(message: types.Message):
             # Разбиваем по ":", так мы определим провайдер
             pre_txt_lower = message.text.lower()
             print(f"pre_txt_lower {pre_txt_lower}")
-            pre_txt_lower = (pre_txt_lower.replace("эх:", ":::").
-                             replace("тиера:", ":::").
-                             replace("нет:", "нет").
-                             replace("ет:", ":::"))
-            print(f"pre_txt_lower {pre_txt_lower}")
+            pre_txt = (pre_txt_lower.replace("тв:", "тв").
+                       replace("ис:", "ис").
+                       replace("нет:", "нет").
+                       replace("он:", "он"))
+            print(f"pre_txt {pre_txt}")
             # txt = message.text.split(":")
-            txt = pre_txt_lower.split(":::")
+            txt = pre_txt.split(":")
             print(f"txt {txt}")
 
             # Строчка ЭтХоум
@@ -377,7 +377,7 @@ async def echo_mess(message: types.Message):
             }
 
             print(message)
-
+            # Найдем фамилию мастера
             if message.forward_from is not None:
                 if message.forward_from.last_name:
                     to_save["master"] = message.forward_from.last_name
