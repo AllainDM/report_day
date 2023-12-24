@@ -398,8 +398,7 @@ async def echo_mess(message: types.Message):
                 elif message.forward_sender_name is not None:
                     to_save["master"] = message.forward_sender_name
                 else:
-                    await bot.send_message(message.chat.id, "Необходимо указать фамилию мастера, отчет не сохранен.")
-                    return
+                    to_save["master"] = "не указан"
 
                 # Выставим мастера вручную
                 if to_save["master"] == "Sergey":
@@ -451,6 +450,10 @@ async def echo_mess(message: types.Message):
                 txt_soname = txt_soname_pre.split(" ")
                 if txt_soname[0].lower() != 'эх':
                     to_save["master"] = txt_soname[0].title()
+
+                if to_save["master"] == "не указан":
+                    await bot.send_message(message.chat.id, "Необходимо указать фамилию мастера, отчет не сохранен.")
+                    return
 
                 # Сообщение об ошибке на основе флагов
                 msg_err = []
