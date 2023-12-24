@@ -79,7 +79,10 @@ async def echo_mess(message: types.Message):
 
         # answer = []
         date_now = datetime.now()
-        date_ago = date_now - timedelta(1)  # здесь мы выставляем минус день
+        print(f"Текущая дата: {date_now}")
+        date_ago = date_now - timedelta(hours=12)  # - hours  # здесь мы выставляем минус 12 часов
+        print(f"Новая дата: {date_ago}")
+        # date_ago = date_now - timedelta(1)  # здесь мы выставляем минус день
         print(date_ago)
         date_now_year = date_ago.strftime("%d.%m.%Y")
         date_now_no_year = date_ago.strftime("%d.%m")
@@ -498,10 +501,11 @@ async def echo_mess(message: types.Message):
                     # Стандартный текст передается тут, а не сохраняется
                     await bot.send_message(message.chat.id,
                                            f"Внимание, возможна ошибка с отчетом мастера "
-                                           f"{to_save['master']}: {msg_err_txt}")
-
+                                           f"{to_save['master']}: {msg_err_txt} Отчет не сохранен.")
+                    return
+                    # Неактуально если отчет не сохраняется?
                     # Сохраним имя мастера и ошибки в файл, для доп вывода при запросе общего за 1 день
-                    to_save["msg_err_txt"] = f"{to_save['master']} {msg_err_txt}. "
+                    # to_save["msg_err_txt"] = f"{to_save['master']} {msg_err_txt}. "
 
                 # Так же создадим список для сохранения номеров ремонтов
                 list_repairs = []
