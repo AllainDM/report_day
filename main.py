@@ -398,7 +398,8 @@ async def echo_mess(message: types.Message):
                 elif message.forward_sender_name is not None:
                     to_save["master"] = message.forward_sender_name
                 else:
-                    to_save["master"] = "не указан"
+                    await bot.send_message(message.chat.id, "Необходимо указать фамилию мастера, отчет не сохранен.")
+                    return
 
                 # Выставим мастера вручную
                 if to_save["master"] == "Sergey":
