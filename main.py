@@ -80,7 +80,7 @@ async def echo_mess(message: types.Message):
         # answer = []
         date_now = datetime.now()
         print(f"Текущая дата: {date_now}")
-        date_ago = date_now - timedelta(hours=12)  # - hours  # здесь мы выставляем минус 12 часов
+        date_ago = date_now - timedelta(hours=15)  # - hours  # здесь мы выставляем минус 15 часов
         print(f"Новая дата: {date_ago}")
         # date_ago = date_now - timedelta(1)  # здесь мы выставляем минус день
         print(date_ago)
@@ -596,6 +596,17 @@ async def echo_mess(message: types.Message):
 
                 print(answe1)
                 await bot.send_message(message.chat.id, f"{answe1}")
+                # Используем функцию подсчета файлов для вывода посчитанных мастеров
+                # TODO возможно лучше создать отдельную функцию
+                if os.path.exists(f"files/{t_o}/{date_now_year}"):
+                    files = os.listdir(f"files/{t_o}/{date_now_year}")
+                    rep_a, num_rep = report(files, date_now_year, t_o)
+
+                    # Выведем имена мастеров для сверки
+                    rep_masters = "Получены отчеты: \n"
+                    for i in range(1, len(num_rep)):
+                        rep_masters += f'{num_rep[i]} \n'
+                    await bot.send_message(message.chat.id, rep_masters)
             except IndexError:
                 print("Тут видимо сообщение не относящееся к отчету.")
 
@@ -687,11 +698,15 @@ def report(files, date, t_o):
                 to_save["list_repairs"] += data["list_repairs"]
 
     # Сохраним в файл
-    # Хотя необходимости нет
+    # Хотя необходимости нет?
     with open(f'files/{t_o}/{date}.json', 'w') as outfile:
         json.dump(to_save, outfile, sort_keys=False, ensure_ascii=False, indent=4, separators=(',', ': '))
 
     return to_save, rep
+
+
+# def search_reports():
+#     ...
 
 
 if __name__ == '__main__':
